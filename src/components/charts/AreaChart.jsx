@@ -1,16 +1,26 @@
 import { useState } from 'react';
-import { Card, CardContent, Typography, Box, ButtonGroup, Button, useTheme } from '@mui/material';
+import { Card, CardContent, Typography, Box, useTheme } from '@mui/material';
 import { AreaChart as RechartsAreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const AreaChart = ({ title, data, dataKey = 'value', xAxisKey = 'name', color = 'primary' }) => {
+// Dit is een grafiek die data laat zien als een vloeiende lijn
+const AreaChart = ({ title, data, dataKey = 'value', xAxisKey = 'date', color = 'primary' }) => {
+  // Haal het thema op (licht of donker)
   const theme = useTheme();
-  const [timeframe, setTimeframe] = useState('monthly'); // weekly, monthly, yearly
   
-  // Filtered data based on the selected timeframe
-  // In a real app, this would likely come from an API
+  // We gebruiken de data zoals die is
   const filteredData = data;
   
+  // Functie om de datum te formatteren
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('nl-NL', { 
+      day: 'numeric',
+      month: 'short'
+    });
+  };
+  
   return (
+    // De kaart waarin de grafiek zit
     <Card
       elevation={0}
       sx={{
@@ -20,46 +30,15 @@ const AreaChart = ({ title, data, dataKey = 'value', xAxisKey = 'name', color = 
       }}
     >
       <CardContent sx={{ padding: 3, height: '100%' }}>
-        {/* Chart header with title and timeframe filters */}
+        {/* Kop met titel */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+          {/* Titel van de grafiek */}
           <Typography variant="h6" color="textPrimary" sx={{ fontWeight: 600 }}>
             {title}
           </Typography>
-          <ButtonGroup size="small" variant="outlined" aria-label="timeframe options">
-            <Button 
-              onClick={() => setTimeframe('weekly')}
-              sx={{ 
-                borderColor: timeframe === 'weekly' ? theme.palette[color].main : undefined,
-                color: timeframe === 'weekly' ? theme.palette[color].main : undefined,
-                fontWeight: timeframe === 'weekly' ? 600 : 400,
-              }}
-            >
-              Week
-            </Button>
-            <Button 
-              onClick={() => setTimeframe('monthly')}
-              sx={{ 
-                borderColor: timeframe === 'monthly' ? theme.palette[color].main : undefined,
-                color: timeframe === 'monthly' ? theme.palette[color].main : undefined,
-                fontWeight: timeframe === 'monthly' ? 600 : 400,
-              }}
-            >
-              Month
-            </Button>
-            <Button 
-              onClick={() => setTimeframe('yearly')}
-              sx={{ 
-                borderColor: timeframe === 'yearly' ? theme.palette[color].main : undefined,
-                color: timeframe === 'yearly' ? theme.palette[color].main : undefined,
-                fontWeight: timeframe === 'yearly' ? 600 : 400,
-              }}
-            >
-              Year
-            </Button>
-          </ButtonGroup>
         </Box>
         
-        {/* Chart */}
+        {/* De grafiek zelf */}
         <Box sx={{ height: 300, width: '100%', mt: 1 }}>
           <ResponsiveContainer width="100%" height="100%">
             <RechartsAreaChart
@@ -71,33 +50,51 @@ const AreaChart = ({ title, data, dataKey = 'value', xAxisKey = 'name', color = 
                 bottom: 0,
               }}
             >
+              {/* Maak een mooie kleurovergang voor de grafiek */}
               <defs>
                 <linearGradient id={`color${color}`} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor={theme.palette[color].main} stopOpacity={0.8}/>
                   <stop offset="95%" stopColor={theme.palette[color].main} stopOpacity={0}/>
                 </linearGradient>
               </defs>
+              
+              {/* Lijnen in de achtergrond */}
               <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
+              
+              {/* As onderaan (horizontaal) met datums */}
               <XAxis 
                 dataKey={xAxisKey} 
                 tickLine={false}
                 axisLine={{ stroke: theme.palette.divider }}
                 tick={{ fill: theme.palette.text.secondary, fontSize: 12 }}
+                tickFormatter={formatDate}
               />
+              
+              {/* As aan de zijkant (verticaal) */}
               <YAxis 
                 tickLine={false}
                 axisLine={{ stroke: theme.palette.divider }}
                 tick={{ fill: theme.palette.text.secondary, fontSize: 12 }}
               />
+              
+              {/* Info die verschijnt als je over de grafiek hovert */}
               <Tooltip
                 contentStyle={{
                   backgroundColor: theme.palette.background.paper,
                   borderColor: theme.palette.divider,
                   borderRadius: 8,
                   boxShadow: theme.shadows[3],
-                  color: theme.palette.text.primary,
+                  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
                 }}
+                labelFormatter={(label) => new Date(label).toLocaleDateString('nl-NL', { 
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                })}
+                formatter={(value) => [`$${value.toLocaleString()}`, 'Value']}
               />
+              
+              {/* De gekleurde vlak onder de lijn */}
               <Area 
                 type="monotone" 
                 dataKey={dataKey} 

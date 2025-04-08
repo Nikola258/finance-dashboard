@@ -2,11 +2,15 @@ import { Card, CardContent, Typography, Box, useTheme } from '@mui/material';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { useCryptoContext } from '../../context/CryptoContext';
 
+// Dit is een grafiek die laat zien hoeveel procent van de markt elke cryptocurrency heeft
 const MarketShareChart = () => {
+  // Haal het thema op (licht of donker)
   const theme = useTheme();
+  
+  // Haal data op van de crypto context
   const { topCoins, loading, error } = useCryptoContext();
   
-  // If loading
+  // Laat een bericht zien als de data nog aan het laden is
   if (loading) {
     return (
       <Box sx={{ p: 3, textAlign: 'center' }}>
@@ -15,7 +19,7 @@ const MarketShareChart = () => {
     );
   }
   
-  // If error
+  // Laat een foutmelding zien als er iets mis is gegaan
   if (error) {
     return (
       <Box sx={{ p: 3, textAlign: 'center' }}>
@@ -24,7 +28,7 @@ const MarketShareChart = () => {
     );
   }
   
-  // Prepare data for the pie chart
+  // Maak de data klaar voor de grafiek
   const marketShareData = topCoins.map(coin => ({
     name: coin.symbol.toUpperCase(),
     value: coin.market_cap,
@@ -32,7 +36,7 @@ const MarketShareChart = () => {
     fullName: coin.name
   }));
   
-  // Custom colors for chart segments
+  // Kleuren voor de taartstukjes
   const COLORS = [
     theme.palette.primary.main,
     theme.palette.secondary.main,
@@ -46,15 +50,15 @@ const MarketShareChart = () => {
     theme.palette.error.light,
   ];
   
-  // Generate a hex color based on string
+  // Maak een kleur op basis van een woord (zodat elke cryptocurrency altijd dezelfde kleur heeft)
   function generateColorFromString(str) {
-    // Use a simple hash function
+    // Maak een getal van het woord
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
     
-    // Convert to hex color
+    // Maak een kleur van het getal
     let color = '#';
     for (let i = 0; i < 3; i++) {
       const value = (hash >> (i * 8)) & 0xFF;
@@ -63,7 +67,7 @@ const MarketShareChart = () => {
     return color;
   }
   
-  // Custom tooltip formatter
+  // Maak de tooltip mooi
   const tooltipFormatter = (value, name, props) => {
     const coin = props.payload;
     return [
@@ -72,7 +76,7 @@ const MarketShareChart = () => {
     ];
   };
   
-  // Custom legend formatter
+  // Maak de uitleg onderaan mooi
   const legendFormatter = (value, entry, index) => {
     return (
       <span style={{ color: theme.palette.text.primary, marginRight: 10 }}>
@@ -82,6 +86,7 @@ const MarketShareChart = () => {
   };
   
   return (
+    // De kaart waarin de grafiek zit
     <Card
       elevation={0}
       sx={{
@@ -90,15 +95,16 @@ const MarketShareChart = () => {
       }}
     >
       <CardContent sx={{ padding: 3, height: '100%' }}>
-        {/* Chart header */}
+        {/* Titel van de grafiek */}
         <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
           Market Share (Top 10)
         </Typography>
         
-        {/* Chart */}
+        {/* De grafiek zelf */}
         <Box sx={{ height: 300, width: '100%' }}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
+              {/* De taartgrafiek */}
               <Pie
                 data={marketShareData}
                 cx="50%"
@@ -109,10 +115,13 @@ const MarketShareChart = () => {
                 dataKey="value"
                 nameKey="name"
               >
+                {/* Maak een stukje voor elk datapunt met een andere kleur */}
                 {marketShareData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
+              
+              {/* Info die verschijnt als je over de taart hovert */}
               <Tooltip 
                 formatter={tooltipFormatter}
                 contentStyle={{
@@ -120,9 +129,11 @@ const MarketShareChart = () => {
                   borderColor: theme.palette.divider,
                   borderRadius: 8,
                   boxShadow: theme.shadows[3],
-                  color: theme.palette.text.primary,
+                  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
                 }}
               />
+              
+              {/* Uitleg aan de zijkant die laat zien wat elk stukje betekent */}
               <Legend 
                 formatter={legendFormatter}
                 layout="vertical" 
