@@ -1,4 +1,4 @@
-import { createContext, useState, useMemo, useContext } from 'react';
+import { createContext, useState, useMemo, useContext, useEffect } from 'react';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { createAppTheme } from '../theme';
 
@@ -13,7 +13,16 @@ export const useThemeContext = () => useContext(ThemeContext);
 
 // Theme provider component
 export const ThemeProviderWrapper = ({ children }) => {
-  const [mode, setMode] = useState('dark');
+  // Load theme mode from localStorage or default to 'dark'
+  const [mode, setMode] = useState(() => {
+    const savedMode = localStorage.getItem('themeMode');
+    return savedMode || 'dark';
+  });
+
+  // Save theme mode to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('themeMode', mode);
+  }, [mode]);
 
   // Theme toggle function
   const toggleTheme = () => {

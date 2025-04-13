@@ -1,23 +1,12 @@
 import { Card, CardContent, Typography, Box, useTheme } from '@mui/material';
 import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
-const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
-  const RADIAN = Math.PI / 180;
-  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-  const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-  return (
-    <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
-      {`${(percent * 100).toFixed(0)}%`}
-    </text>
-  );
-};
-
+// Dit is een grafiek die data laat zien als een taart
 const PieChart = ({ title, data, dataKey = 'value', nameKey = 'name' }) => {
+  // Haal het thema op (licht of donker)
   const theme = useTheme();
   
-  // Custom colors for pie chart sections
+  // Kleuren voor de taartstukjes
   const COLORS = [
     theme.palette.primary.main,
     theme.palette.secondary.main,
@@ -30,6 +19,7 @@ const PieChart = ({ title, data, dataKey = 'value', nameKey = 'name' }) => {
   ];
 
   return (
+    // De kaart waarin de grafiek zit
     <Card
       elevation={0}
       sx={{
@@ -38,39 +28,44 @@ const PieChart = ({ title, data, dataKey = 'value', nameKey = 'name' }) => {
       }}
     >
       <CardContent sx={{ padding: 3, height: '100%' }}>
-        {/* Chart header with title */}
+        {/* Titel van de grafiek */}
         <Typography variant="h6" color="textPrimary" sx={{ fontWeight: 600, mb: 2 }}>
           {title}
         </Typography>
         
-        {/* Chart */}
+        {/* De grafiek zelf */}
         <Box sx={{ height: 300, width: '100%' }}>
           <ResponsiveContainer width="100%" height="100%">
             <RechartsPieChart>
+              {/* De taartgrafiek */}
               <Pie
                 data={data}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={renderCustomizedLabel}
                 outerRadius={90}
                 dataKey={dataKey}
                 nameKey={nameKey}
               >
+                {/* Maak een stukje voor elk datapunt met een andere kleur */}
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
+              
+              {/* Info die verschijnt als je over de taart hovert */}
               <Tooltip
                 contentStyle={{
                   backgroundColor: theme.palette.background.paper,
                   borderColor: theme.palette.divider,
                   borderRadius: 8,
                   boxShadow: theme.shadows[3],
-                  color: theme.palette.text.primary,
+                  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
                 }}
                 formatter={(value) => [`$${value}`, '']}
               />
+              
+              {/* Uitleg onderaan die laat zien wat elk stukje betekent */}
               <Legend 
                 layout="horizontal" 
                 verticalAlign="bottom" 
