@@ -231,21 +231,21 @@ const CardsPage = () => {
   const [cards, setCards] = useState(() => {
     const savedCards = localStorage.getItem('cards');
     return savedCards ? JSON.parse(savedCards) : [
-      {
-        type: 'VISA',
-        number: '**** **** **** 1234',
-        holder: 'John Doe',
-        expiry: '12/24',
-        gradient: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)'
-      },
-      {
-        type: 'MASTERCARD',
-        number: '**** **** **** 5678',
-        holder: 'John Doe',
-        expiry: '10/25',
-        gradient: 'linear-gradient(45deg, #FF4081 30%, #FF80AB 90%)'
-      }
-    ];
+    {
+      type: 'VISA',
+      number: '**** **** **** 1234',
+      holder: 'John Doe',
+      expiry: '12/24',
+      gradient: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)'
+    },
+    {
+      type: 'MASTERCARD',
+      number: '**** **** **** 5678',
+      holder: 'John Doe',
+      expiry: '10/25',
+      gradient: 'linear-gradient(45deg, #FF4081 30%, #FF80AB 90%)'
+    }
+  ];
   });
 
   // Save cards to localStorage when they change
@@ -322,7 +322,7 @@ const CardsPage = () => {
         {cards.map((card, index) => (
           <Grid item xs={12} md={6} key={index}>
             <CardItem card={card} />
-          </Grid>
+        </Grid>
         ))}
       </Grid>
 

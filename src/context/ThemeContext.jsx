@@ -13,15 +13,15 @@ export const useThemeContext = () => useContext(ThemeContext);
 
 // Theme provider component
 export const ThemeProviderWrapper = ({ children }) => {
-  // Initialize theme from localStorage or default to 'dark'
+  // Load theme mode from localStorage or default to 'dark'
   const [mode, setMode] = useState(() => {
-    const savedTheme = localStorage.getItem('theme');
-    return savedTheme || 'dark';
+    const savedMode = localStorage.getItem('themeMode');
+    return savedMode || 'dark';
   });
 
-  // Save theme preference to localStorage whenever it changes
+  // Save theme mode to localStorage when it changes
   useEffect(() => {
-    localStorage.setItem('theme', mode);
+    localStorage.setItem('themeMode', mode);
   }, [mode]);
 
   // Theme toggle function

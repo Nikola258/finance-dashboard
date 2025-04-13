@@ -67,13 +67,31 @@ const MarketShareChart = () => {
     return color;
   }
   
-  // Maak de tooltip mooi
-  const tooltipFormatter = (value, name, props) => {
-    const coin = props.payload;
-    return [
-      `$${(value / 1000000000).toFixed(2)}B`, 
-      `${coin.fullName} (${coin.name})`
-    ];
+  // Custom tooltip component for better visibility
+  const CustomTooltip = ({ active, payload, label }) => {
+    const theme = useTheme();
+    
+    if (!active || !payload || !payload.length) return null;
+    
+    const coin = payload[0].payload;
+    return (
+      <Box
+        sx={{
+          backgroundColor: theme.palette.background.paper,
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: 2,
+          p: 1.5,
+          boxShadow: theme.shadows[3],
+        }}
+      >
+        <Typography variant="body2" sx={{ color: theme.palette.text.primary, fontWeight: 500 }}>
+          {coin.fullName} ({coin.name})
+        </Typography>
+        <Typography variant="body2" sx={{ color: theme.palette.text.primary, mt: 0.5 }}>
+          ${(coin.value / 1000000000).toFixed(2)}B
+        </Typography>
+      </Box>
+    );
   };
   
   // Maak de uitleg onderaan mooi
@@ -123,14 +141,7 @@ const MarketShareChart = () => {
               
               {/* Info die verschijnt als je over de taart hovert */}
               <Tooltip 
-                formatter={tooltipFormatter}
-                contentStyle={{
-                  backgroundColor: theme.palette.background.paper,
-                  borderColor: theme.palette.divider,
-                  borderRadius: 8,
-                  boxShadow: theme.shadows[3],
-                  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
-                }}
+                content={<CustomTooltip />}
               />
               
               {/* Uitleg aan de zijkant die laat zien wat elk stukje betekent */}
